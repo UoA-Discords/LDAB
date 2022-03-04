@@ -4,10 +4,12 @@ import { Command, CommandParams } from '../../types/Command';
 
 export class Ping extends Command {
     public name = 'ping';
-    public description = 'ping the bot';
+    public description = 'Ping the bot.';
     public build(): SlashCommandBuilder {
         const command = new SlashCommandBuilder().setName(this.name).setDescription(this.description);
-        command.addBooleanOption((option) => option.setName('hidden').setDescription('Show results to everyone.'));
+
+        command.addBooleanOption((option) => option.setName('hidden').setDescription('Show results to everyone'));
+
         return command;
     }
 

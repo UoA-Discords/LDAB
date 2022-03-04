@@ -11,7 +11,7 @@ export interface SheetManagerEvents {
     userRemoved: (info: Entry) => void;
 }
 
-interface Entry {
+export interface Entry {
     timestamp: number;
     username: string;
     id: Snowflake;

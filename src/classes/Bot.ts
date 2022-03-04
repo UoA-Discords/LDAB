@@ -1,4 +1,4 @@
-import { RESTPostAPIApplicationCommandsJSONBody as RawCommand } from 'discord-api-types';
+import { RESTPostAPIApplicationCommandsJSONBody as RawCommand, Snowflake } from 'discord-api-types';
 import { Client, Collection, Intents, Interaction } from 'discord.js';
 import { Routes } from 'discord-api-types/v9';
 import { config } from '../config';
@@ -9,7 +9,7 @@ import commands from '../commands';
 import { Command } from '../types/Command';
 import Logger from './Logger';
 import { REST } from '@discordjs/rest';
-import { SheetManager } from './SheetManager';
+import { Entry, SheetManager } from './SheetManager';
 
 export class Bot {
     public readonly client: Client<true>;
@@ -140,5 +140,9 @@ export class Bot {
             this._logger.log(`Error executing the ${interaction.commandName} command for ${interaction.user.username}`);
             this._logger.log(error);
         }
+    }
+
+    public getEntry(id: Snowflake): Entry | undefined {
+        return this.sheetManager.entries[id];
     }
 }
