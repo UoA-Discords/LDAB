@@ -84,3 +84,8 @@ LDAB limits itself to set of simple actions once a blacklisted user is detected.
 If you want to run your own version of the bot:
 
 1. Create an application on Discord with the permissions, scopes, and intents listed in [permissions](#permissions).
+2. Make an [`auth.json`](./auth.json) file with the entries filled out as per [`the example`](./auth.example.json).
+3. Install dependencies using `yarn` or `npm install`.
+4. Start the bot in development mode using `yarn dev` or `npm run dev`.
+5. Make a production-ready build using `yarn build` or `npm run build`.
+6. Start the bot in production mode using `yarn start` or `node .`

@@ -1,0 +1,4 @@
+{
+    "discordToken": "your_discord_bot_token",
+    "googleSheetsAPIKey": "your_google_api_key"
+}
