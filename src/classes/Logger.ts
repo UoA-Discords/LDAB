@@ -10,12 +10,12 @@ if (!existsSync(`${baseDir}/logs`)) {
 class Logger {
     private _filePath: string;
 
-    public constructor(name: string) {
+    public constructor(name: string, version: string) {
         this._filePath = `${baseDir}/logs/${name}.log`;
 
         if (!existsSync(this._filePath)) {
             writeFileSync(this._filePath, '', 'utf-8');
-            this.log('*** New Instance Started ***');
+            this.log(`*** New Instance Started [${version}] ***`);
         }
     }
 

@@ -20,7 +20,7 @@ export class Bot {
     public readonly configManager: GuildConfigManager = new GuildConfigManager();
 
     private readonly _auth: Auth;
-    private readonly _logger: Logger = new Logger('main');
+    private readonly _logger: Logger = new Logger('main', this.version);
     private readonly _startTime: number = Date.now();
     private readonly _commands: Collection<string, Command> = new Collection();
 
