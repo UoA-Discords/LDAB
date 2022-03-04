@@ -42,13 +42,13 @@ export class SheetManager extends TypedEmitter<SheetManagerEvents> {
             path: `/v4/spreadsheets/${sheetId}/values/A:D?key=${apiKey}`,
         };
         this._logger = logger;
-        this._dataManager = new DataManager(`data/${sheetId}.json`, JSON.stringify({}, undefined, 4));
+        this._dataManager = new DataManager(`data/lists/${sheetId}.json`, JSON.stringify({}, undefined, 4));
         this.entries = JSON.parse(this._dataManager.data);
 
         setInterval(() => this._main(), config.checkInterval * 1000);
     }
 
-    public save(): void {
+    private save(): void {
         this._dataManager.data = JSON.stringify(this.entries, undefined, 4);
     }
 

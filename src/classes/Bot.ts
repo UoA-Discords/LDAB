@@ -1,5 +1,5 @@
 import { RESTPostAPIApplicationCommandsJSONBody as RawCommand, Snowflake } from 'discord-api-types';
-import { Client, Collection, Intents, Interaction } from 'discord.js';
+import { Client, Collection, CommandInteraction, Intents, Interaction } from 'discord.js';
 import { Routes } from 'discord-api-types/v9';
 import { config } from '../config';
 import getVersion from '../helpers/getVersion';
@@ -10,12 +10,14 @@ import { Command } from '../types/Command';
 import Logger from './Logger';
 import { REST } from '@discordjs/rest';
 import { Entry, SheetManager } from './SheetManager';
+import GuildConfigManager from './GuildConfigManager';
 
 export class Bot {
     public readonly client: Client<true>;
     public readonly devMode: boolean;
     public readonly version: string = getVersion();
     public readonly sheetManager: SheetManager;
+    public readonly configManager: GuildConfigManager = new GuildConfigManager();
 
     private readonly _auth: Auth;
     private readonly _logger: Logger = new Logger('main');
@@ -126,12 +128,33 @@ export class Bot {
         }
     }
 
+    private canUseCommand(interaction: CommandInteraction<'present'>): boolean {
+        if (interaction.memberPermissions.has('ADMINISTRATOR')) return true;
+        const allowedRoleId = this.configManager.getGuildConfig(interaction.guildId).adminRole;
+        if (!allowedRoleId) return false;
+
+        if (Array.isArray(interaction.member.roles)) {
+            return interaction.member.roles.includes(allowedRoleId);
+        } else return interaction.member.roles.cache.has(allowedRoleId);
+    }
+
     private async onInteractionCreate(interaction: Interaction): Promise<void> {
         if (!interaction.isCommand()) return;
 
         const command = this._commands.get(interaction.commandName);
         if (!command) {
             return await interaction.reply({ content: `I don't have a command called ${interaction.commandName}` });
+        }
+
+        if (!interaction.inGuild()) {
+            return await interaction.reply({
+                content: 'You need to be in a server to use my commands',
+                ephemeral: true,
+            });
+        }
+
+        if (!this.canUseCommand(interaction)) {
+            return await interaction.reply({ content: 'You are not allowed to use this command', ephemeral: true });
         }
 
         try {

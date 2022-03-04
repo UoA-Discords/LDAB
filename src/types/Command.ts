@@ -3,7 +3,7 @@ import { CommandInteraction } from 'discord.js';
 import { Bot } from '../classes/Bot';
 
 export interface CommandParams {
-    interaction: CommandInteraction;
+    interaction: CommandInteraction<'present'>;
     bot: Bot;
 }
 
