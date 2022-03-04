@@ -9,11 +9,13 @@ import commands from '../commands';
 import { Command } from '../types/Command';
 import Logger from './Logger';
 import { REST } from '@discordjs/rest';
+import { SheetManager } from './SheetManager';
 
 export class Bot {
     public readonly client: Client<true>;
     public readonly devMode: boolean;
     public readonly version: string = getVersion();
+    public readonly sheetManager: SheetManager;
 
     private readonly _auth: Auth;
     private readonly _logger: Logger = new Logger('main');
@@ -28,7 +30,16 @@ export class Bot {
             intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
         });
 
+        this.sheetManager = new SheetManager(auth.googleSheetsApiKey, auth.googleSheetId, this._logger);
+
         this.start();
+
+        this.sheetManager.on('userAdded', (user) => {
+            console.log(`New user: ${user.username}`);
+        });
+        this.sheetManager.on('userRemoved', (user) => {
+            console.log(`User removed: ${user.username}`);
+        });
     }
 
     /** Attempts to log the client in, existing the process if unable to do so. */

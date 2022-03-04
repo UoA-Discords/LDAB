@@ -7,10 +7,14 @@ export interface Config {
         /** Log in to Discord. */
         login: number;
     };
+
+    /** Time between checking for updates on the google sheet in seconds. */
+    checkInterval: number;
 }
 
 export const config: Config = {
     timeoutThresholds: {
         login: 5,
     },
+    checkInterval: 3,
 };
