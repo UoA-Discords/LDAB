@@ -27,5 +27,12 @@
     },
     "dependencies": {
         "discord.js": "^13.6.0"
+    },
+    "nodemonConfig": {
+        "watch": [
+            "src",
+            "auth.json"
+        ],
+        "ext": "ts"
     }
 }
