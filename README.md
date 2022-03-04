@@ -6,7 +6,7 @@ LDAB uses a global, third-party banlist to detect banned users in other servers 
 
 ## Scope
 
-LDAB limits itself to set of simple actions once a blacklisted user is detected. More complicated actions (for example initiating a vote between admins) are left to the admins of the server to handle.
+LDAB limits itself to set of simple actions once a blacklisted user is detected. More complicated actions (initiating a vote between admins for example) are left to the admins of the server to handle.
 
 ## Permissions
 
@@ -48,11 +48,11 @@ LDAB limits itself to set of simple actions once a blacklisted user is detected.
     </tr>
     <tr>
         <td>Server Members</td>
-        <td>Scan existing members for blacklisted users.[^1]</td>
+        <td>Scan existing members for blacklisted users.<sup>[1]</sup></td>
     </tr>
 </table>
 
-[^1]: Only on initially joining a server.
+[1]: Only on initial join.
 
 # Installation
 
