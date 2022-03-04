@@ -2,7 +2,7 @@
     "name": "ldab",
     "private": true,
     "version": "0.0.1",
-    "main": "index.js",
+    "main": "build/index.js",
     "repository": "https://github.com/NachoToast/LDAB.git",
     "author": "NachoToast <32235595+NachoToast@users.noreply.github.com>",
     "license": "CC-BY-SA-4.0",
@@ -24,5 +24,8 @@
         "prettier": "^2.5.1",
         "ts-node": "^10.6.0",
         "typescript": "^4.6.2"
+    },
+    "dependencies": {
+        "discord.js": "^13.6.0"
     }
 }
