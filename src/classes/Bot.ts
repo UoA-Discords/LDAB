@@ -89,6 +89,16 @@ export class Bot {
 
         this.client.user.setStatus('dnd');
 
+        const makeStatusMessage = () => {
+            this.client.user.setActivity({
+                type: 'WATCHING',
+                name: `${this.client.guilds.cache.size} server${this.client.guilds.cache.size !== 1 ? 's' : ''}`,
+            });
+        };
+
+        makeStatusMessage();
+        setInterval(() => makeStatusMessage(), 1000 * 60 * 60);
+
         const commandsToDeploy: RawCommand[] = [];
         console.log(
             `Deploying ${commands.length} Command${commands.length !== 1 ? 's' : ''} ${
