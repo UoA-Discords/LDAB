@@ -1,6 +1,6 @@
 import { channelMention, SlashCommandBuilder } from '@discordjs/builders';
 import { ChannelType } from 'discord-api-types';
-import { GuildTextBasedChannel } from 'discord.js';
+import { GuildTextBasedChannel, Role } from 'discord.js';
 import { Command, CommandParams } from '../../types/Command';
 import { Actions, choices, timeoutOptionMap, TimeoutOptions } from '../../types/GuildConfig';
 
@@ -240,6 +240,20 @@ class Action implements Command {
             }
             case Actions.GiveRole: {
                 const newRole = interaction.options.getRole('role', true);
+                if (newRole instanceof Role) {
+                    if (!newRole.editable) {
+                        await interaction.reply({
+                            content:
+                                "I don't have permission to give people this role (make sure I have a role higher than it)",
+                            ephemeral: true,
+                        });
+                        return;
+                    }
+                } else {
+                    await interaction.reply({ content: 'Invalid role', ephemeral: true });
+                    return;
+                }
+
                 const prevRoleId = existingConfig.joinActions[Actions.GiveRole];
                 if (prevRoleId) {
                     const prevRole = await interaction.guild?.roles.fetch(prevRoleId);

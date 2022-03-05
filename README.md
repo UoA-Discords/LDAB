@@ -41,12 +41,6 @@ LDAB limits itself to set of simple actions once a blacklisted user is detected.
     </tr>
 </table>
 
-<details>
-
-<summary>
-    Experimental please ignore
-</summary>
-
 <table>
     <tr>
         <th>Intent</th>
@@ -59,10 +53,6 @@ LDAB limits itself to set of simple actions once a blacklisted user is detected.
 </table>
 
 [1]: Only on initial join.
-
-</details>
-
-<br />
 
 <table>
     <tr>

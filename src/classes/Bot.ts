@@ -11,6 +11,8 @@ import Logger from './Logger';
 import { REST } from '@discordjs/rest';
 import { Entry, SheetManager } from './SheetManager';
 import GuildConfigManager from './GuildConfigManager';
+import moment from 'moment';
+import { Actions, timeoutOptionMap } from '../types/GuildConfig';
 
 export class Bot {
     public readonly client: Client<true>;
@@ -50,9 +52,7 @@ export class Bot {
         this.client.once('ready', () => this.onReady());
         this.client.on('error', (err) => this._logger.log(err));
         this.client.on('interactionCreate', (int) => this.onInteractionCreate(int));
-        this.client.on('guildMemberAdd', (member) => {
-            console.log(`${member.user.username} joined ${member.guild.name}`);
-        });
+        this.client.on('guildMemberAdd', (member) => this.onJoin(member));
 
         const timeout = config.timeoutThresholds.login
             ? setTimeout(() => {
@@ -173,7 +173,103 @@ export class Bot {
         const entry = this.sheetManager.entries[member.id] as Entry | undefined;
         if (!entry) return;
 
-        // const guildConfig = this.configManager.getGuildConfig(member.guild.id);
+        const guildConfig = this.configManager.getGuildConfig(member.guild.id);
+        if (!guildConfig.joinActions) return;
+
+        const banReason = guildConfig.joinActions[Actions.Ban];
+        if (banReason) {
+            try {
+                await member.ban({ reason: banReason, days: 1 });
+            } catch (error) {
+                this._logger.log(
+                    `Error banning ${member.user.username} (${member.id}) from ${member.guild.name} (${member.guild.id})`,
+                );
+                this._logger.log(error);
+            }
+            return;
+        }
+
+        const notifyChannel = guildConfig.joinActions[Actions.NotifyChannel];
+        if (notifyChannel) {
+            const channel = await this.client.channels.fetch(notifyChannel);
+            if (channel?.type === 'GUILD_TEXT') {
+                try {
+                    const content: string[] = [
+                        `❗ ${member.user.username} just joined the server`,
+                        `In global banlist since ${new Date(entry.timestamp).toLocaleDateString('en-NZ')} (${moment(
+                            entry.timestamp,
+                        ).fromNow()})`,
+                        `Reason: ${entry.reason}`,
+                    ];
+
+                    await channel.send({ content: content.join('\n') });
+                } catch (error) {
+                    this._logger.log(
+                        `Error sending message about ${member.user.username} (${member.id}) to channel ${
+                            channel?.name || notifyChannel
+                        } in server ${member.guild.name} (${member.guild.id})`,
+                    );
+                    this._logger.log(error);
+                }
+            }
+        }
+
+        const threadChannel = guildConfig.joinActions[Actions.NotifyThread];
+        if (threadChannel) {
+            const channel = await this.client.channels.fetch(threadChannel);
+            if (channel?.type === 'GUILD_TEXT') {
+                try {
+                    const thread = await channel.threads.create({
+                        name: member.user.username,
+                        reason: 'Global blacklist alerting',
+                    });
+                    const content: string[] = [
+                        `❗ ${member.user.username} just joined the server`,
+                        `In global banlist since ${new Date(entry.timestamp).toLocaleDateString('en-NZ')} (${moment(
+                            entry.timestamp,
+                        ).fromNow()})`,
+                        `Reason: ${entry.reason}`,
+                    ];
+
+                    await thread.send({ content: content.join('\n') });
+                } catch (error) {
+                    this._logger.log(
+                        `Error making thread for ${member.user.username} (${member.id}) under channel ${
+                            channel?.name || threadChannel
+                        } in server ${member.guild.name} (${member.guild.id})`,
+                    );
+                    this._logger.log(error);
+                }
+            }
+        }
+
+        const roleId = guildConfig.joinActions[Actions.GiveRole];
+        if (roleId) {
+            const role = await member.guild.roles.fetch(roleId);
+            if (role) {
+                try {
+                    await member.roles.add(role);
+                } catch (error) {
+                    this._logger.log(
+                        `Error giving ${role.name} role to ${member.user.username} (${member.id}) in server ${member.guild.name} (${member.guild.id})`,
+                    );
+                    this._logger.log(error);
+                }
+            }
+        }
+
+        const timeoutTime = guildConfig.joinActions[Actions.Timeout];
+        if (timeoutTime) {
+            const duration = timeoutOptionMap[timeoutTime];
+            try {
+                await member.timeout(duration, 'Global blacklist timeout');
+            } catch (error) {
+                this._logger.log(
+                    `Error timing out ${member.user.username} (${member.id}) for ${duration}ms in server ${member.guild.name} (${member.guild.id})`,
+                );
+                this._logger.log(error);
+            }
+        }
     }
 
     public getEntry(id: Snowflake): Entry | undefined {
