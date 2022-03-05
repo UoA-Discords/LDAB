@@ -132,6 +132,7 @@ export class Bot {
 
         try {
             await api.put(Routes.applicationCommands(this.client.user.id), { body });
+            console.log('Deployed successfully');
         } catch (error) {
             console.log(error);
             process.exit(1);
