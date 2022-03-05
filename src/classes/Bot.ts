@@ -1,5 +1,5 @@
 import { RESTPostAPIApplicationCommandsJSONBody as RawCommand, Snowflake } from 'discord-api-types';
-import { Client, Collection, CommandInteraction, Intents, Interaction } from 'discord.js';
+import { Client, Collection, CommandInteraction, GuildMember, Intents, Interaction } from 'discord.js';
 import { Routes } from 'discord-api-types/v9';
 import { config } from '../config';
 import getVersion from '../helpers/getVersion';
@@ -29,7 +29,7 @@ export class Bot {
         this.devMode = devmode;
 
         this.client = new Client({
-            intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+            intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS],
         });
 
         this.sheetManager = new SheetManager(auth.googleSheetsApiKey, auth.googleSheetId, this._logger);
@@ -50,6 +50,9 @@ export class Bot {
         this.client.once('ready', () => this.onReady());
         this.client.on('error', (err) => this._logger.log(err));
         this.client.on('interactionCreate', (int) => this.onInteractionCreate(int));
+        this.client.on('guildMemberAdd', (member) => {
+            console.log(`${member.user.username} joined ${member.guild.name}`);
+        });
 
         const timeout = config.timeoutThresholds.login
             ? setTimeout(() => {
@@ -163,6 +166,14 @@ export class Bot {
             this._logger.log(`Error executing the ${interaction.commandName} command for ${interaction.user.username}`);
             this._logger.log(error);
         }
+    }
+
+    // eslint-disable-next-line require-await
+    private async onJoin(member: GuildMember): Promise<void> {
+        const entry = this.sheetManager.entries[member.id] as Entry | undefined;
+        if (!entry) return;
+
+        // const guildConfig = this.configManager.getGuildConfig(member.guild.id);
     }
 
     public getEntry(id: Snowflake): Entry | undefined {

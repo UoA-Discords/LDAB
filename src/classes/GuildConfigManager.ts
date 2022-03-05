@@ -27,4 +27,9 @@ export default class GuildConfigManager {
         this._guildData[id] = newConfig;
         this.save();
     }
+
+    public clearGuildConfig(id: Snowflake): void {
+        delete this._guildData[id];
+        this.save();
+    }
 }

@@ -2,7 +2,7 @@
 
 _**L**inked **D**iscord **A**dministrative **B**ot_
 
-LDAB uses a global, third-party banlist to detect banned users in other servers and act accordingly.
+LDAB uses a global, third-party banlist to detect blacklisted users in other servers and act accordingly.
 
 ## Limitations
 

@@ -7,17 +7,19 @@ class AdminRole implements Command {
     public build(): SlashCommandBuilder {
         const command = new SlashCommandBuilder().setName(this.name).setDescription(this.description);
 
-        command.addSubcommand((option) =>
-            option
+        command.addSubcommand((subcommand) =>
+            subcommand
                 .setName('set')
-                .setDescription('Designate a new role')
+                .setDescription('Set the role that can use my commands')
                 .addRoleOption((option) => option.setName('role').setDescription('The role to use').setRequired(true)),
         );
 
-        command.addSubcommand((option) => option.setName('get').setDescription('Get the designated role'));
+        command.addSubcommand((subcommand) =>
+            subcommand.setName('get').setDescription('Get the role that can use by commands'),
+        );
 
-        command.addSubcommand((option) =>
-            option.setName('clear').setDescription('Clear the currently designated role'),
+        command.addSubcommand((subcommand) =>
+            subcommand.setName('clear').setDescription('Make no role able to use my commands'),
         );
 
         return command;
