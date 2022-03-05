@@ -12,6 +12,8 @@ LDAB uses a Google sheets banlist to detect blacklisted users in other servers a
 
 It can also perform multiple actions, e.g. timing out and notifying admins. By default it will do nothing however, so be sure to check out the [command guide](#command-guide) to configure LDAB for your server.
 
+[Invite Link](https://discord.com/api/oauth2/authorize?client_id=949192601037320232&permissions=1409017710596&scope=bot%20applications.commands)
+
 Its recommended you:
 
 -   **Don't** auto ban users.
@@ -25,6 +27,7 @@ Once you've invited LDAB to you server, you'll need to do some configuration so 
 -   `/actions`
 
     -   Manage the actions taken when a blacklisted user joins the server.
+    -   Note that with auto-role actions, the role must be below LDAB in the hierarchy. 
 
 -   `/notifications`
 
