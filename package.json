@@ -1,7 +1,7 @@
 {
     "name": "ldab",
     "private": true,
-    "version": "0.0.1",
+    "version": "1.0.0",
     "main": "build/index.js",
     "repository": "https://github.com/NachoToast/LDAB.git",
     "author": "NachoToast <32235595+NachoToast@users.noreply.github.com>",
