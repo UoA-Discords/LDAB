@@ -44,7 +44,7 @@ Once you've invited LDAB to you server, you'll need to do some configuration so 
 
     -   Check if a single user is in the banlist.
 
--   `ping`
+-   `/ping`
     -   Check if the bot is up.
 
 ### Command Permissions
