@@ -87,7 +87,7 @@ export class Bot {
             })`,
         );
 
-        this.client.user.setActivity('👀', { type: 'WATCHING' });
+        this.client.user.setStatus('dnd');
 
         const commandsToDeploy: RawCommand[] = [];
         console.log(
