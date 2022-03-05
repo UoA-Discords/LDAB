@@ -27,6 +27,7 @@ Once you've invited LDAB to you server, you'll need to do some configuration so 
 -   `/actions`
 
     -   Manage the actions taken when a blacklisted user joins the server.
+    -   Note that with auto-role actions, the role must be below LDAB in the hierarchy. 
 
 -   `/notifications`
 
