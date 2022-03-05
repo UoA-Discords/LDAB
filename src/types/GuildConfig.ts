@@ -41,4 +41,5 @@ export default interface GuildConfig {
         /** Channel id to make thread from. */
         [Actions.NotifyThread]?: Snowflake;
     };
+    notificationsChannel?: Snowflake;
 }

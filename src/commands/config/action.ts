@@ -267,8 +267,8 @@ class Action implements Command {
             case Actions.NotifyChannel: {
                 const newChannel = interaction.options.getChannel('channel', true) as GuildTextBasedChannel;
                 const prevChannelId = existingConfig.joinActions[Actions.NotifyChannel];
-                if (prevChannelId) previousValue = `**${channelMention(prevChannelId)}**`;
-                newValue = `**${channelMention(newChannel.id)}**`;
+                if (prevChannelId) previousValue = `${channelMention(prevChannelId)}`;
+                newValue = `${channelMention(newChannel.id)}`;
                 valueDesc = 'alerts channel';
                 existingConfig.joinActions[Actions.NotifyChannel] = newChannel.id;
                 break;
@@ -276,8 +276,8 @@ class Action implements Command {
             case Actions.NotifyThread: {
                 const newChannel = interaction.options.getChannel('channel', true) as GuildTextBasedChannel;
                 const prevChannelId = existingConfig.joinActions[Actions.NotifyThread];
-                if (prevChannelId) previousValue = `**${channelMention(prevChannelId)}**`;
-                newValue = `**${channelMention(newChannel.id)}**`;
+                if (prevChannelId) previousValue = `${channelMention(prevChannelId)}`;
+                newValue = `${channelMention(newChannel.id)}`;
                 valueDesc = 'channel for threads';
                 existingConfig.joinActions[Actions.NotifyThread] = newChannel.id;
                 break;

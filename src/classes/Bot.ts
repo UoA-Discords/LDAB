@@ -1,5 +1,15 @@
 import { RESTPostAPIApplicationCommandsJSONBody as RawCommand, Snowflake } from 'discord-api-types';
-import { Client, Collection, CommandInteraction, GuildMember, Intents, Interaction } from 'discord.js';
+import {
+    Client,
+    Collection,
+    CommandInteraction,
+    Guild,
+    GuildMember,
+    GuildTextBasedChannel,
+    Intents,
+    Interaction,
+    MessageEmbed,
+} from 'discord.js';
 import { Routes } from 'discord-api-types/v9';
 import { config } from '../config';
 import getVersion from '../helpers/getVersion';
@@ -13,6 +23,7 @@ import { Entry, SheetManager } from './SheetManager';
 import GuildConfigManager from './GuildConfigManager';
 import moment from 'moment';
 import { Actions, timeoutOptionMap } from '../types/GuildConfig';
+import { userMention } from '@discordjs/builders';
 
 export class Bot {
     public readonly client: Client<true>;
@@ -38,12 +49,8 @@ export class Bot {
 
         this.start();
 
-        this.sheetManager.on('userAdded', (user) => {
-            console.log(`New user: ${user.username}`);
-        });
-        this.sheetManager.on('userRemoved', (user) => {
-            console.log(`User removed: ${user.username}`);
-        });
+        this.sheetManager.on('userAdded', (user) => this.onListAdd(user));
+        this.sheetManager.on('userRemoved', (user) => this.onListRemove(user));
     }
 
     /** Attempts to log the client in, existing the process if unable to do so. */
@@ -274,5 +281,113 @@ export class Bot {
 
     public getEntry(id: Snowflake): Entry | undefined {
         return this.sheetManager.entries[id];
+    }
+
+    private makeListEventEmbed(
+        entry: Entry,
+        guild: Guild,
+        member: GuildMember,
+        eventType: 'added' | 'removed',
+    ): MessageEmbed {
+        const description: string[] = [];
+
+        if (eventType === 'added') {
+            description.push(
+                `${userMention(member.id)} was added to the blacklist ${moment(entry.timestamp).fromNow()}.`,
+            );
+        } else {
+            description.push(
+                `${userMention(member.id)} was removed from the blacklist after ${moment(entry.timestamp).fromNow(
+                    true,
+                )}`,
+            );
+        }
+
+        const joinedAt = member.joinedAt;
+        if (!joinedAt) {
+            description.push('⚠️ User has been in this server for an unknown amount of time.');
+        } else {
+            description.push(
+                `⚠️ User has been in this server for **${moment(joinedAt).fromNow(true)}**`,
+                `*Joined ${new Date(joinedAt).toLocaleDateString('en-NZ')}*`,
+            );
+        }
+
+        const embed = new MessageEmbed()
+            .setTitle(eventType === 'added' ? 'Added to Blacklist' : 'Removed From Blacklist')
+            .setDescription(description.join('\n'))
+            .addField('Reason', entry.reason || 'No reason specified.')
+            .addField('Listed', new Date(entry.timestamp).toLocaleString('en-NZ'))
+            .setThumbnail(member.displayAvatarURL() ?? '');
+
+        return embed;
+    }
+
+    /** Runs when a user is added to the global banlist. */
+    private async onListAdd(entry: Entry): Promise<void> {
+        for (const guildId in this.configManager.data) {
+            const guildConfig = this.configManager.getGuildConfig(guildId);
+            if (!guildConfig.notificationsChannel) continue;
+
+            try {
+                const channelPromise = this.client.channels.fetch(
+                    guildConfig.notificationsChannel,
+                ) as Promise<GuildTextBasedChannel | null>;
+
+                const guildPromise = this.client.guilds.fetch(guildId);
+
+                const [guild, channel] = await Promise.all([guildPromise, channelPromise]);
+                if (!channel) continue;
+
+                let member: GuildMember;
+                try {
+                    member = await guild.members.fetch(entry.id);
+                } catch (error) {
+                    // user not in this guild = dont bother sending notification
+                    continue;
+                }
+
+                const embed = this.makeListEventEmbed(entry, guild, member, 'added');
+
+                await channel.send({ embeds: [embed] });
+            } catch (error) {
+                this._logger.log(`Error sending list add notification to guild ${guildId}`);
+                this._logger.log(error);
+            }
+        }
+    }
+
+    /** Runs when a user is removed from the global banlist. */
+    private async onListRemove(entry: Entry): Promise<void> {
+        for (const guildId in this.configManager.data) {
+            const guildConfig = this.configManager.getGuildConfig(guildId);
+            if (!guildConfig.notificationsChannel) continue;
+
+            try {
+                const channelPromise = this.client.channels.fetch(
+                    guildConfig.notificationsChannel,
+                ) as Promise<GuildTextBasedChannel | null>;
+
+                const guildPromise = this.client.guilds.fetch(guildId);
+
+                const [guild, channel] = await Promise.all([guildPromise, channelPromise]);
+                if (!channel) continue;
+
+                let member: GuildMember;
+                try {
+                    member = await guild.members.fetch(entry.id);
+                } catch (error) {
+                    // user not in this guild = dont bother sending notification
+                    continue;
+                }
+
+                const embed = this.makeListEventEmbed(entry, guild, member, 'removed');
+
+                await channel.send({ embeds: [embed] });
+            } catch (error) {
+                this._logger.log(`Error sending list remove notification to guild ${guildId}`);
+                this._logger.log(error);
+            }
+        }
     }
 }

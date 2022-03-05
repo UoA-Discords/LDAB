@@ -64,6 +64,7 @@ export class SheetManager extends TypedEmitter<SheetManagerEvents> {
         // slice at 1 to exclude the header row
         for (const rawEntry of latestList.values.slice(1)) {
             const id = rawEntry[2];
+            if (id === undefined) continue;
             if (this.entries[id]) {
                 deletedIds.delete(id);
                 continue;

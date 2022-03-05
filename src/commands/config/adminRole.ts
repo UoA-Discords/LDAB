@@ -15,7 +15,7 @@ class AdminRole implements Command {
         );
 
         command.addSubcommand((subcommand) =>
-            subcommand.setName('get').setDescription('Get the role that can use by commands'),
+            subcommand.setName('get').setDescription('Get the role that can use my commands'),
         );
 
         command.addSubcommand((subcommand) =>

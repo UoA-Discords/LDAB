@@ -3,7 +3,7 @@ import GuildConfig from '../types/GuildConfig';
 import DataManager from './DataManager';
 
 export default class GuildConfigManager {
-    private _guildData: { [guildId: Snowflake]: GuildConfig };
+    private _guildData: Record<Snowflake, GuildConfig>;
     private _guildConfigDataManager: DataManager;
 
     public constructor() {
@@ -31,5 +31,9 @@ export default class GuildConfigManager {
     public clearGuildConfig(id: Snowflake): void {
         delete this._guildData[id];
         this.save();
+    }
+
+    public get data(): Record<Snowflake, GuildConfig> {
+        return this._guildData;
     }
 }
